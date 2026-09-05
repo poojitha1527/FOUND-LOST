@@ -4,6 +4,8 @@
   "description": "Full-stack Lost & Found application for campuses",
   "main": "backend/server.js",
   "scripts": {
+    "build": "node scripts/build-frontend.js",
+    "postinstall": "npm run build",
     "dev": "cd backend && npm run dev",
     "start": "cd backend && npm start",
     "seed": "cd backend && npm run seed",
