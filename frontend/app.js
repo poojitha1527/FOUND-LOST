@@ -1,5 +1,5 @@
 // ===== API CONFIGURATION =====
-const API_URL = 'http://localhost:5000/api';
+const API_URL = window.APP_CONFIG?.API_URL || 'http://localhost:5000/api';
 let authToken = localStorage.getItem('authToken');
 let currentUser = null;
 

@@ -93,6 +93,8 @@ Publish Directory: build
 
 Alternatively, create a new Render Blueprint from `render.yaml`. Do not set the frontend Root Directory to `frontend`, because the build script and `package.json` are at the repository root.
 
+Set `API_URL` on the frontend service to the complete deployed API URL, for example `https://found-lost-api.onrender.com/api`. Set `CORS_ORIGIN` on the API service to the complete deployed frontend URL. The frontend build writes `API_URL` into `build/config.js`; it no longer depends on localhost in production.
+
 Create the Blueprint from the repository, then set these environment variables for the API service:
 
 ```text
@@ -101,7 +103,7 @@ JWT_SECRET=<a long random secret>
 CORS_ORIGIN=<the deployed frontend URL>
 ```
 
-After deployment, update `API_URL` near the top of `frontend/app.js` to the API service URL followed by `/api`, then redeploy the static site.
+After changing `API_URL`, redeploy the static site so the generated configuration is included.
 
 ## Commands
 
