@@ -81,7 +81,17 @@ Open `http://localhost:8080` in a browser. The frontend currently expects the AP
 The repository includes `render.yaml` for a Render Blueprint with two services:
 
 - `found-lost-api`: Node web service rooted at `backend`
-- `found-lost-frontend`: static site publishing `frontend` directly; no `build` directory is required
+- `found-lost-frontend`: static site building and publishing the root `build` directory
+
+To use the existing Render service, update its settings manually because an existing service does not automatically adopt changes from `render.yaml`:
+
+```text
+Root Directory: leave empty
+Build Command: npm install && npm run build
+Publish Directory: build
+```
+
+Alternatively, create a new Render Blueprint from `render.yaml`. Do not set the frontend Root Directory to `frontend`, because the build script and `package.json` are at the repository root.
 
 Create the Blueprint from the repository, then set these environment variables for the API service:
 

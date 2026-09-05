@@ -18,5 +18,5 @@ services:
 
   - type: static
     name: found-lost-frontend
-    buildCommand: echo "Static frontend - no build required"
-    staticPublishPath: ./frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
