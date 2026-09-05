@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Lost &amp; Found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --board:#16241c;
+    --board-light:#1f3327;
+    --board-line: rgba(255,255,255,0.06);
+    --kraft:#efe3c8;
+    --kraft-2:#e7d8b3;
+    --kraft-edge:#d9c69a;
+    --ink:#2a2117;
+    --ink-soft:#6b5c46;
+    --lost:#b23a2e;
+    --found:#2f6e4e;
+    --resolved:#7a7266;
+    --accent:#e3a73b;
+    --paper-line: rgba(42,33,23,0.14);
+    --radius: 10px;
+    --shadow-card: 0 6px 16px rgba(0,0,0,0.28), 0 2px 4px rgba(0,0,0,0.18);
+    --shadow-modal: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,255,255,0.03), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(255,255,255,0.03), transparent 40%),
+      var(--board);
+    background-image:
+      linear-gradient(var(--board-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--board-line) 1px, transparent 1px),
+      var(--board);
+    background-size: 28px 28px, 28px 28px, auto;
+    color: var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:56px 0 28px;}
+  .hero-tag{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--accent); color:var(--ink);
+    font-family:'Barlow Condensed', sans-serif; font-weight:700; letter-spacing:0.14em;
+    font-size:12.5px; text-transform:uppercase;
+    padding:6px 12px; border-radius:100px;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+    transform: rotate(-1.5deg);
+  }
+  .hero-tag .dot{width:7px;height:7px;border-radius:50%;background:var(--lost); animation: pulse-dot 1.8s ease-in-out infinite;}
+  @keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:0.25;}}
+  h1.hero-title{
+    font-family:'Archivo Black', sans-serif;
+    color:var(--kraft);
+    font-size:clamp(34px, 6vw, 60px);
+    line-height:1.02;
+    margin:18px 0 10px;
+    letter-spacing:-0.01em;
+  }
+  h1.hero-title em{
+    font-style:normal; color:var(--accent);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.35);
+  }
+  .hero-sub{
+    color:rgba(239,227,200,0.72);
+    font-size:16.5px; max-width:560px; line-height:1.55; margin-bottom:30px;
+  }
+  .hero-actions{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:34px; align-items:center;}
+  .user-menu{display:flex; gap:10px; align-items:center;}
+  .user-btn{
+    background:rgba(239,227,200,0.15); color:var(--kraft); border:none; padding:11px 18px;
+    border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; transition: all .15s ease;
+  }
+  .user-btn:hover{background:rgba(239,227,200,0.25);}
+  .btn{
+    border:none; border-radius:8px; padding:13px 22px;
+    font-weight:700; font-size:15px; letter-spacing:0.01em;
+    display:inline-flex; align-items:center; gap:9px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:active{transform: translateY(1px);}
+  .btn-lost{ background:var(--lost); color:#fbe9e5; box-shadow:0 4px 0 #7d2820, 0 8px 18px rgba(178,58,46,0.35);}
+  .btn-lost:hover{ box-shadow:0 5px 0 #7d2820, 0 10px 22px rgba(178,58,46,0.45); transform:translateY(-2px);}
+  .btn-found{ background:var(--found); color:#e8f5ee; box-shadow:0 4px 0 #1e4a34, 0 8px 18px rgba(47,110,78,0.35);}
+  .btn-found:hover{ box-shadow:0 5px 0 #1e4a34, 0 10px 22px rgba(47,110,78,0.45); transform:translateY(-2px);}
+  .btn svg{width:18px;height:18px;}
+
+  .stats-row{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:8px;}
+  .stat-stub{
+    background:var(--kraft); border-radius:6px; padding:10px 18px;
+    box-shadow: var(--shadow-card);
+    display:flex; flex-direction:column; gap:2px; min-width:112px;
+    border:1px dashed var(--kraft-edge);
+    transform: rotate(-0.6deg);
+  }
+  .stat-stub:nth-child(2){transform:rotate(0.8deg);}
+  .stat-stub:nth-child(3){transform:rotate(-0.3deg);}
+  .stat-num{font-family:'Space Mono', monospace; font-weight:700; font-size:24px; color:var(--ink);}
+  .stat-label{font-family:'Barlow Condensed', sans-serif; text-transform:uppercase; letter-spacing:0.09em; font-size:12px; color:var(--ink-soft); font-weight:600;}
+  .stat-stub.lost .stat-num{color:var(--lost);}
+  .stat-stub.found .stat-num{color:var(--found);}
+  .stat-stub.resolved .stat-num{color:var(--resolved);}
+
+  /* ---------- CONTROLS ---------- */
+  .controls{
+    position:sticky; top:0; z-index:20;
+    background:rgba(22,36,28,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid var(--board-line);
+    padding:14px 0;
+  }
+  .controls-inner{display:flex; gap:12px; flex-wrap:wrap; align-items:center;}
+  .search-box{
+    flex:1 1 220px; position:relative;
+  }
+  .search-box input{
+    width:100%; padding:11px 14px 11px 38px; border-radius:8px; border:1px solid transparent;
+    background:var(--kraft); color:var(--ink); font-size:14.5px; font-family:'Inter',sans-serif;
+    outline:none;
+  }
+  .search-box input:focus{ box-shadow: 0 0 0 3px rgba(227,167,59,0.55);}
+  .search-box svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; opacity:0.55;}
+  select, .chip-group{font-family:'Inter',sans-serif;}
+  select{
+    padding:11px 14px; border-radius:8px; border:none; background:var(--kraft); color:var(--ink);
+    font-size:14px; font-weight:600; outline:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232a2117' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center; padding-right:32px;
+  }
+  select:focus{ box-shadow: 0 0 0 3px rgba(227,167,59,0.55);}
+  .chip-group{display:flex; gap:6px; background:rgba(239,227,200,0.1); padding:4px; border-radius:9px;}
+  .chip{
+    padding:8px 13px; border-radius:6px; border:none; background:transparent; color:rgba(239,227,200,0.75);
+    font-size:13.5px; font-weight:700; font-family:'Barlow Condensed',sans-serif; letter-spacing:0.04em; text-transform:uppercase;
+    transition: all .15s ease;
+  }
+  .chip.active{background:var(--accent); color:var(--ink);}
+  .chip:hover:not(.active){ color:var(--kraft);}
+
+  /* ---------- BOARD / GRID ---------- */
+  .board-section{padding:34px 0 80px;}
+  .board-meta{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; color:rgba(239,227,200,0.55); font-size:13px; font-family:'Space Mono',monospace;}
+  .live-dot{display:inline-flex; align-items:center; gap:6px;}
+  .live-dot .d{width:7px;height:7px;border-radius:50%;background:#5fd68a; box-shadow:0 0 0 0 rgba(95,214,138,0.6); animation: live-ping 2s infinite;}
+  @keyframes live-ping{
+    0%{box-shadow:0 0 0 0 rgba(95,214,138,0.55);}
+    70%{box-shadow:0 0 0 7px rgba(95,214,138,0);}
+    100%{box-shadow:0 0 0 0 rgba(95,214,138,0);}
+  }
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(272px, 1fr)); gap:26px 22px;
+  }
+
+  /* ticket card */
+  .ticket{
+    position:relative; display:flex; background:var(--kraft);
+    border-radius: var(--radius); box-shadow: var(--shadow-card);
+    cursor:pointer; overflow:hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+    animation: drop-in .35s ease both;
+  }
+  @keyframes drop-in{ from{opacity:0; transform:translateY(10px) scale(.98);} to{opacity:1; transform:translateY(0) scale(1);} }
+  .ticket.fresh{ animation: drop-in .35s ease both, glow-new 2.4s ease 1; }
+  @keyframes glow-new{ 0%{box-shadow:0 0 0 3px rgba(227,167,59,0.8), var(--shadow-card);} 100%{box-shadow: var(--shadow-card);} }
+  .ticket:hover{ transform: rotate(0deg) translateY(-5px) scale(1.015); box-shadow: 0 14px 26px rgba(0,0,0,0.35);}
+  .ticket::before{
+    content:''; position:absolute; top:-7px; left:50%; transform:translateX(-50%);
+    width:16px; height:16px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff6dc, var(--accent) 60%, #9a6f1e 100%);
+    box-shadow: 0 3px 4px rgba(0,0,0,0.4);
+    z-index:3;
+  }
+  .ticket-main{flex:1; padding:20px 16px 16px 18px; min-width:0;}
+  .ticket-top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:10px;}
+  .cat-icon{
+    width:34px; height:34px; border-radius:8px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(42,33,23,0.07);
+  }
+  .cat-icon svg{width:19px; height:19px; stroke:var(--ink-soft);}
+  .ticket-photo{
+    width:100%; height:130px; object-fit:cover; display:block;
+    border-radius:6px; margin-bottom:12px; background:rgba(42,33,23,0.06);
+  }
+  .photo-upload{
+    border:1.5px dashed var(--kraft-edge); border-radius:9px; padding:14px;
+    text-align:center; cursor:pointer; position:relative; background:rgba(42,33,23,0.03);
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .photo-upload:hover{border-color:var(--accent); background:rgba(227,167,59,0.06);}
+  .photo-upload input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer;}
+  .photo-upload .ph-icon{width:22px; height:22px; margin:0 auto 6px; stroke:var(--ink-soft); display:block;}
+  .photo-upload .ph-text{font-size:13px; color:var(--ink-soft); font-weight:600;}
+  .photo-upload .ph-sub{font-size:11.5px; color:var(--ink-soft); opacity:0.75; margin-top:2px;}
+  .photo-preview-wrap{position:relative; display:inline-block; margin-top:2px; width:100%;}
+  .photo-preview-wrap img{width:100%; max-height:180px; object-fit:cover; border-radius:9px; display:block;}
+  .photo-remove{
+    position:absolute; top:8px; right:8px; width:28px; height:28px; border-radius:50%;
+    background:rgba(20,15,10,0.75); color:#fff; border:none; font-size:14px; display:flex; align-items:center; justify-content:center;
+  }
+  .detail-photo{width:100%; max-height:260px; object-fit:cover; border-radius:10px; margin-bottom:16px; display:block;}
+  .ticket-title{
+    font-family:'Barlow Condensed', sans-serif; font-weight:700; font-size:19px; color:var(--ink);
+    line-height:1.15; margin:0 0 4px;
+  }
+  .ticket-cat{font-size:11.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;}
+  .ticket-desc{font-size:13.5px; color:var(--ink-soft); line-height:1.5; margin:8px 0 12px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+  .ticket-meta{display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:var(--ink-soft); border-top:1px dashed var(--paper-line); padding-top:10px;}
+  .ticket-meta span{display:flex; align-items:center; gap:6px;}
+  .ticket-meta svg{width:13px;height:13px; opacity:0.7; flex-shrink:0;}
+  .stamp{
+    position:absolute; top:14px; right:-30px; width:130px; text-align:center;
+    transform: rotate(28deg); font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:0.12em;
+    font-size:12px; padding:3px 0; border-top:2px solid; border-bottom:2px solid;
+    text-transform:uppercase; mix-blend-mode:multiply; opacity:0.88; pointer-events:none;
+  }
+  .stamp.lost{color:var(--lost); border-color:var(--lost);}
+  .stamp.found{color:var(--found); border-color:var(--found);}
+  .stamp.resolved{color:var(--resolved); border-color:var(--resolved);}
+  .ticket-stub{
+    width:56px; flex-shrink:0; border-left:2px dashed var(--kraft-edge);
+    background:var(--kraft-2); display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+    padding:14px 0;
+  }
+  .stub-icon svg{width:16px;height:16px; stroke:var(--ink-soft);}
+  .stub-num{
+    writing-mode:vertical-rl; text-orientation:mixed; font-family:'Space Mono',monospace;
+    font-size:11px; letter-spacing:0.06em; color:var(--ink-soft); font-weight:700;
+  }
+
+  .empty-state{
+    grid-column:1/-1; text-align:center; padding:70px 20px; color:rgba(239,227,200,0.6);
+  }
+  .empty-state svg{width:52px; height:52px; opacity:0.5; margin-bottom:14px; stroke:var(--kraft);}
+  .empty-state h3{font-family:'Barlow Condensed',sans-serif; color:var(--kraft); font-size:22px; margin:0 0 6px;}
+  .empty-state p{font-size:14px; max-width:360px; margin:0 auto;}
+
+  .skeleton{
+    background:linear-gradient(90deg, var(--kraft) 25%, var(--kraft-2) 37%, var(--kraft) 63%);
+    background-size:400% 100%; animation: sk 1.4s ease infinite;
+    border-radius:var(--radius); height:168px; box-shadow:var(--shadow-card);
+  }
+  @keyframes sk{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
+
+  /* ---------- MODALS ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(10,16,12,0.72); backdrop-filter:blur(3px);
+    display:flex; align-items:center; justify-content:center; z-index:100; padding:20px;
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+  .overlay.show{opacity:1; pointer-events:auto;}
+  .modal{
+    background:var(--kraft); border-radius:14px; max-width:520px; width:100%;
+    max-height:88vh; overflow-y:auto; box-shadow:var(--shadow-modal);
+    transform: translateY(18px) scale(0.97); transition: transform .22s ease;
+    position:relative;
+  }
+  .overlay.show .modal{transform:translateY(0) scale(1);}
+  .modal-head{
+    padding:22px 24px 14px; display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px dashed var(--paper-line);
+  }
+  .modal-head h2{font-family:'Barlow Condensed',sans-serif; font-size:24px; margin:0; letter-spacing:0.01em;}
+  .modal-head .ticket-id{font-family:'Space Mono',monospace; font-size:11px; color:var(--ink-soft);}
+  .close-btn{
+    width:32px; height:32px; border-radius:50%; border:none; background:rgba(42,33,23,0.08);
+    display:flex; align-items:center; justify-content:center; color:var(--ink);
+  }
+  .close-btn:hover{background:rgba(42,33,23,0.16);}
+  .modal-body{padding:20px 24px 26px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-family:'Barlow Condensed',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; font-size:12.5px; color:var(--ink-soft); margin-bottom:6px;}
+  .field input, .field select, .field textarea{
+    width:100%; padding:11px 13px; border-radius:8px; border:1px solid var(--kraft-edge); background:#f8f2e2;
+    font-family:'Inter',sans-serif; font-size:14.5px; color:var(--ink); outline:none; resize:vertical;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(227,167,59,0.35);}
+  .field-row{display:flex; gap:12px;}
+  .field-row .field{flex:1;}
+  .type-toggle{display:flex; gap:10px; margin-bottom:18px;}
+  .type-toggle button{
+    flex:1; padding:12px; border-radius:9px; border:2px solid var(--kraft-edge); background:transparent;
+    font-weight:700; font-family:'Barlow Condensed',sans-serif; letter-spacing:0.05em; text-transform:uppercase; font-size:14px;
+    color:var(--ink-soft); transition: all .15s ease;
+  }
+  .type-toggle button.active.lost{border-color:var(--lost); color:var(--lost); background:rgba(178,58,46,0.08);}
+  .type-toggle button.active.found{border-color:var(--found); color:var(--found); background:rgba(47,110,78,0.08);}
+  .submit-btn{
+    width:100%; padding:14px; border:none; border-radius:9px; font-weight:700; font-size:15.5px;
+    background:var(--ink); color:var(--kraft); margin-top:6px;
+  }
+  .submit-btn:hover{background:#1c150e;}
+  .hint{font-size:12px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
+
+  /* detail modal specific */
+  .detail-desc{font-size:14.5px; line-height:1.65; color:var(--ink); margin-bottom:16px;}
+  .detail-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px;}
+  .detail-item{background:rgba(42,33,23,0.05); border-radius:8px; padding:10px 12px;}
+  .detail-item .k{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); font-weight:700; margin-bottom:3px;}
+  .detail-item .v{font-size:14px; color:var(--ink); font-weight:600;}
+  .contact-box{
+    border:1px dashed var(--kraft-edge); border-radius:9px; padding:14px; margin-bottom:16px; text-align:center;
+  }
+  .contact-reveal-btn{
+    background:var(--accent); color:var(--ink); border:none; padding:11px 20px; border-radius:8px; font-weight:700; font-size:14px;
+  }
+  .contact-value{font-family:'Space Mono',monospace; font-size:16px; font-weight:700; color:var(--ink); letter-spacing:0.02em;}
+  .action-row{display:flex; gap:10px; margin-top:6px;}
+  .action-row button{flex:1;}
+  .btn-resolve{background:var(--found); color:#fff; border:none; padding:12px; border-radius:8px; font-weight:700; font-size:14px;}
+  .btn-ghost{background:transparent; border:1.5px solid var(--kraft-edge); color:var(--ink); padding:12px; border-radius:8px; font-weight:700; font-size:14px;}
+  .status-pill{display:inline-block; padding:4px 11px; border-radius:100px; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;}
+  .status-pill.lost{background:rgba(178,58,46,0.14); color:var(--lost);}
+  .status-pill.found{background:rgba(47,110,78,0.14); color:var(--found);}
+  .status-pill.resolved{background:rgba(122,114,102,0.16); color:var(--resolved);}
+
+  /* toasts */
+  .toast-stack{position:fixed; bottom:20px; right:20px; z-index:200; display:flex; flex-direction:column; gap:10px; max-width:320px;}
+  .toast{
+    background:var(--kraft); color:var(--ink); padding:13px 16px; border-radius:9px; box-shadow:var(--shadow-card);
+    font-size:13.5px; font-weight:600; display:flex; align-items:center; gap:10px;
+    animation: toast-in .25s ease;
+    border-left:4px solid var(--accent);
+  }
+  .toast.new-item{border-left-color:var(--found);}
+  .toast.error{border-left-color:var(--lost);}
+  @keyframes toast-in{ from{opacity:0; transform:translateX(20px);} to{opacity:1; transform:translateX(0);} }
+  .toast .x{margin-left:auto; opacity:0.5; cursor:pointer; font-size:16px;}
+
+  footer{ text-align:center; padding:26px 20px 40px; color:rgba(239,227,200,0.35); font-size:12px;}
+  footer button{background:none; border:none; color:rgba(239,227,200,0.45); text-decoration:underline; font-size:12px; cursor:pointer;}
+
+  @media (max-width:640px){
+    .detail-grid{grid-template-columns:1fr;}
+    .hero{padding:40px 0 20px;}
+    .stats-row{gap:10px;}
+    .stat-stub{min-width:96px; padding:8px 14px;}
+  }
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <span class="hero-tag"><span class="dot"></span> Live campus board</span>
+      <div class="user-menu" id="userMenu"></div>
+    </div>
+    <h1 class="hero-title">Lost something?<br>Someone's probably <em>found</em> it.</h1>
+    <p class="hero-sub">Post a notice, browse what's been turned in, and message the finder directly — all updates appear here in real time for everyone on campus.</p>
+    <div class="hero-actions">
+      <button class="btn btn-lost" onclick="openReportModal('lost')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v14M6 8l6-6 6 6"/><path d="M5 14v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+        Report Lost Item
+      </button>
+      <button class="btn btn-found" onclick="openReportModal('found')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22V8M6 16l6 6 6-6"/><path d="M5 10V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6"/></svg>
+        I Found Something
+      </button>
+    </div>
+    <div class="stats-row">
+      <div class="stat-stub lost"><span class="stat-num" id="statLost">0</span><span class="stat-label">Lost, open</span></div>
+      <div class="stat-stub found"><span class="stat-num" id="statFound">0</span><span class="stat-label">Found, open</span></div>
+      <div class="stat-stub resolved"><span class="stat-num" id="statResolved">0</span><span class="stat-label">Reunited</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="wrap controls-inner">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchInput" type="text" placeholder="Search by item, location, or keyword…">
+    </div>
+    <select id="categoryFilter">
+      <option value="all">All categories</option>
+      <option value="electronics">Electronics</option>
+      <option value="bag">Bags &amp; Accessories</option>
+      <option value="id">ID / Cards</option>
+      <option value="keys">Keys</option>
+      <option value="clothing">Clothing</option>
+      <option value="books">Books &amp; Stationery</option>
+      <option value="bottle">Water Bottles</option>
+      <option value="other">Other</option>
+    </select>
+    <div class="chip-group" id="statusChips">
+      <button class="chip active" data-status="all">All</button>
+      <button class="chip" data-status="lost">Lost</button>
+      <button class="chip" data-status="found">Found</button>
+      <button class="chip" data-status="resolved">Reunited</button>
+    </div>
+  </div>
+</div>
+
+<section class="board-section">
+  <div class="wrap">
+    <div class="board-meta">
+      <span class="live-dot"><span class="d"></span> Live — updates every few seconds</span>
+      <span id="lastSync">connecting…</span>
+    </div>
+    <div class="grid" id="board">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Campus Lost &amp; Found · a shared board — notices are visible to everyone who opens this page.
+</footer>
+
+<!-- REPORT MODAL -->
+<div class="overlay" id="reportOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="reportModalTitle">Report a Lost Item</h2>
+      <button class="close-btn" onclick="closeModal('reportOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="type-toggle">
+        <button type="button" id="toggleLost" class="lost" onclick="setReportType('lost')">Lost it</button>
+        <button type="button" id="toggleFound" class="found" onclick="setReportType('found')">Found it</button>
+      </div>
+      <form id="reportForm" onsubmit="submitReport(event)">
+        <div class="field">
+          <label for="f-title">Item title</label>
+          <input id="f-title" required placeholder="e.g. Black Sony headphones">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="f-category">Category</label>
+            <select id="f-category" required>
+              <option value="electronics">Electronics</option>
+              <option value="bag">Bags &amp; Accessories</option>
+              <option value="id">ID / Cards</option>
+              <option value="keys">Keys</option>
+              <option value="clothing">Clothing</option>
+              <option value="books">Books &amp; Stationery</option>
+              <option value="bottle">Water Bottles</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-date" id="f-date-label">Date lost</label>
+            <input id="f-date" type="date" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-location" id="f-location-label">Last seen location</label>
+          <input id="f-location" required placeholder="e.g. Library, 2nd floor">
+        </div>
+        <div class="field">
+          <label for="f-desc">Description</label>
+          <textarea id="f-desc" rows="3" placeholder="Color, brand, distinguishing marks…"></textarea>
+        </div>
+        <div class="field">
+          <label>Photo (optional)</label>
+          <div id="photoUploadZone">
+            <label class="photo-upload" id="photoDropLabel">
+              <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-9 9"/></svg>
+              <div class="ph-text">Tap to add a photo</div>
+              <div class="ph-sub">Helps people recognize it at a glance</div>
+              <input type="file" accept="image/*" id="f-photo" onchange="handlePhotoSelect(event)">
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-contact">Your contact (email or phone)</label>
+          <input id="f-contact" required placeholder="you@campus.edu">
+          <div class="hint">Shown only when someone taps "reveal contact" on your notice.</div>
+        </div>
+        <button class="submit-btn" type="submit" id="reportSubmitBtn">Post Notice</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="detailOverlay">
+  <div class="modal" id="detailModalContent"></div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
