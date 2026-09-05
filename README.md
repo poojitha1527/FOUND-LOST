@@ -76,6 +76,23 @@ npx http-server frontend -p 8080
 
 Open `http://localhost:8080` in a browser. The frontend currently expects the API at `http://localhost:5000/api`; update `API_URL` in `frontend/app.js` when using a different API host.
 
+## Deploying on Render
+
+The repository includes `render.yaml` for a Render Blueprint with two services:
+
+- `found-lost-api`: Node web service rooted at `backend`
+- `found-lost-frontend`: static site publishing `frontend` directly; no `build` directory is required
+
+Create the Blueprint from the repository, then set these environment variables for the API service:
+
+```text
+MONGODB_URI=<your MongoDB Atlas connection string>
+JWT_SECRET=<a long random secret>
+CORS_ORIGIN=<the deployed frontend URL>
+```
+
+After deployment, update `API_URL` near the top of `frontend/app.js` to the API service URL followed by `/api`, then redeploy the static site.
+
 ## Commands
 
 From the project root:
