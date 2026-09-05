@@ -1,0 +1,30 @@
+{
+  "name": "campus-lost-found",
+  "version": "1.0.0",
+  "description": "Full-stack Lost & Found application for campuses",
+  "main": "backend/server.js",
+  "scripts": {
+    "dev": "cd backend && npm run dev",
+    "start": "cd backend && npm start",
+    "seed": "cd backend && npm run seed",
+    "install-all": "cd backend && npm install && cd ../frontend && npm install 2>/dev/null || true"
+  },
+  "keywords": [
+    "lost",
+    "found",
+    "campus",
+    "items",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/campus-lost-found"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}
