@@ -8,6 +8,10 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
 
 // Security middleware
 app.use(helmet());
@@ -21,7 +25,13 @@ app.use(limiter);
 
 // CORS
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: (requestOrigin, callback) => {
+    if (!requestOrigin || corsOrigins.includes(requestOrigin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error(`Origin not allowed by CORS: ${requestOrigin}`));
+  },
   credentials: true
 }));
 
@@ -101,6 +111,7 @@ async function startApp() {
   app.listen(PORT, () => {
     console.log(`Campus Lost & Found API running on http://localhost:${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV}`);
+    console.log(`Allowed frontend origins: ${corsOrigins.join(', ')}`);
   });
 }
 
